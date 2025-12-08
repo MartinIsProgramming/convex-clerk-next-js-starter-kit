@@ -10,7 +10,7 @@ A full-stack starter kit with Next.js 15, Convex, Clerk authentication, and shad
 | Backend | Convex |
 | Auth | Clerk |
 | UI | shadcn/ui, Radix UI, Lucide Icons |
-| Tooling | TypeScript 5.9, Biome, pnpm |
+| Tooling | TypeScript 5.9, Biome, Knip, pnpm |
 
 ## Features
 
@@ -20,6 +20,7 @@ A full-stack starter kit with Next.js 15, Convex, Clerk authentication, and shad
 - Pre-configured shadcn/ui components
 - Strict TypeScript
 - Biome linting & formatting
+- Knip for detecting unused code & dependencies
 
 ## Prerequisites
 
@@ -100,6 +101,8 @@ Open [http://localhost:3000](http://localhost:3000) to see your app.
 | `pnpm lint` | Check code with Biome |
 | `pnpm lint:fix` | Auto-fix linting issues |
 | `pnpm format` | Format code with Biome |
+| `pnpm knip` | Find unused code & dependencies |
+| `pnpm knip:fix` | Auto-remove unused exports |
 
 ## Project Structure
 
