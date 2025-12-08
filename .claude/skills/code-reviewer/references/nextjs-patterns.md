@@ -347,6 +347,193 @@ export const getUser = query({
 });
 ```
 
+## Component Naming Conventions
+
+### Required Suffixes
+
+| Suffix | Type | Location | Purpose |
+|--------|------|----------|---------|
+| `*Content` | Server | `server/` | Data fetching wrapper |
+| `*Skeleton` | Server | `server/` | Loading state |
+| `*Form` | Client | `client/` | Form with validation |
+| `*Dialog` | Client | `client/` | Modal component |
+| `*DataTable` | Client | `client/` | Interactive table |
+| `*Card` | Server | `server/` | Presentation card |
+
+**Examples:**
+- `ApartmentsListContent` - fetches and displays apartments
+- `AdminStatsSkeleton` - loading placeholder
+- `NewApartmentForm` - form with validation
+- `ConfirmReservationDialog` - modal dialog
+
+**Flags:**
+- Form component without `*Form` suffix
+- Dialog component without `*Dialog` suffix
+- Data-fetching component without `*Content` suffix
+
+### File Location
+
+```
+src/features/[feature]/components/
+├── server/           # Server components (default)
+│   ├── *Content.tsx
+│   ├── *Skeleton.tsx
+│   └── *Card.tsx
+└── client/           # Client components ("use client")
+    ├── *Form.tsx
+    ├── *Dialog.tsx
+    └── *DataTable.tsx
+```
+
+---
+
+## Data Fetching Patterns
+
+### Method Selection
+
+| Method | Location | Reactive | Use Case |
+|--------|----------|----------|----------|
+| `preloadQuery` | Server Component | Yes* | SSR with reactivity |
+| `usePreloadedQuery` | Client Component | Yes | Consume preloaded data |
+| `useQuery` | Client Component | Yes | Real-time client data |
+| `fetchQuery` | Server Component | No | Static/cached data |
+| `useMutation` | Client Component | - | Write operations |
+| `useAction` | Client Component | - | External API calls |
+
+*Reactivity via `usePreloadedQuery` in client child
+
+### Correct Pattern: Server → Client
+
+```tsx
+// ✅ Page (Server Component)
+export default async function ProductsPage() {
+  const token = await getAuthToken();
+  const preloaded = await preloadQuery(api.products.list, {}, { token });
+
+  return (
+    <div>
+      <PageHeader title="Products" /> {/* Static */}
+      <ProductList preloaded={preloaded} /> {/* Dynamic */}
+    </div>
+  );
+}
+
+// ✅ Client Component
+"use client";
+export function ProductList({ preloaded }: Props) {
+  const products = usePreloadedQuery(preloaded);
+  return products.map(p => <ProductCard key={p._id} product={p} />);
+}
+```
+
+**Flags:**
+- `useQuery` in client when `preloadQuery` could be used from server
+- Missing `undefined` check with `useQuery` (loading state)
+- `fetchQuery` when reactivity is needed
+
+---
+
+## Form Patterns (React Hook Form + Zod)
+
+### Required Structure
+
+```tsx
+// 1. Zod schema
+const schema = z.object({
+  email: z.string().email("Invalid email"),
+  name: z.string().min(2, "Min 2 characters"),
+});
+
+type FormData = z.infer<typeof schema>;
+
+// 2. Form component
+export function UserForm({ onSubmit }: Props) {
+  const { control, handleSubmit, formState: { errors, isSubmitting, isValid } } = useForm<FormData>({
+    resolver: zodResolver(schema),
+    defaultValues: { email: "", name: "" },
+    mode: "onChange",
+  });
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <Controller
+        name="email"
+        control={control}
+        render={({ field }) => (
+          <div>
+            <Label htmlFor="email">Email</Label>
+            <Input {...field} id="email" aria-invalid={!!errors.email} />
+            {errors.email && <p className="text-destructive text-sm">{errors.email.message}</p>}
+          </div>
+        )}
+      />
+      <Button type="submit" disabled={!isValid || isSubmitting}>
+        {isSubmitting ? "Saving..." : "Submit"}
+      </Button>
+    </form>
+  );
+}
+```
+
+### Creation vs Edit Forms
+
+| Aspect | Creation Form | Edit Form |
+|--------|--------------|-----------|
+| Default values | Empty | Pre-filled with existing data |
+| Submit enabled | `isValid` | `isDirty && isValid` |
+| After submit | Redirect to new resource | `reset(data)` to clear dirty |
+
+**Flags:**
+- Form without Zod schema
+- Missing `zodResolver`
+- Not using `Controller` for controlled inputs
+- Missing `isSubmitting` disabled state
+- Edit form without `isDirty` check
+
+---
+
+## Suspense Patterns
+
+### Granular Suspense (Required)
+
+```tsx
+// ❌ Wrong - entire page waits
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<FullPageSkeleton />}>
+      <PageHeader />
+      <Stats />
+      <RecentActivity />
+    </Suspense>
+  );
+}
+
+// ✅ Correct - static renders immediately
+export default function DashboardPage() {
+  return (
+    <div className="space-y-6">
+      <PageHeader title="Dashboard" /> {/* Immediate */}
+
+      <Suspense fallback={<StatsSkeleton />}>
+        <Stats /> {/* Async */}
+      </Suspense>
+
+      <Suspense fallback={<ActivitySkeleton />}>
+        <RecentActivity /> {/* Async */}
+      </Suspense>
+    </div>
+  );
+}
+```
+
+**Flags:**
+- Suspense wrapping entire page
+- Suspense wrapping static content
+- Missing Suspense for async components
+- No skeleton fallback
+
+---
+
 ## Performance
 
 ### Missing Suspense

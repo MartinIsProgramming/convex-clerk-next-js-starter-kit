@@ -230,3 +230,90 @@ type Response =
   | { status: 'success'; data: Data }
   | { status: 'error'; error: Error };
 ```
+
+---
+
+## Project-Specific Rules
+
+### Imports - Path Aliases
+
+Use path aliases instead of relative imports:
+
+```typescript
+// ❌ Relative imports
+import { cn } from "../../../lib/utils";
+import { Button } from "../../components/ui/button";
+import { api } from "../../../convex/_generated/api";
+
+// ✅ Path aliases
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { api } from "@convex/_generated/api";
+```
+
+**Available aliases:**
+- `@/*` → `src/*`
+- `@convex/*` → `convex/*`
+
+### Styling - Tailwind Only
+
+```tsx
+// ❌ Custom CSS files
+import "./styles.css";
+
+// ❌ Inline styles
+<div style={{ backgroundColor: "red" }}>
+
+// ❌ CSS modules
+import styles from "./Component.module.css";
+
+// ✅ Tailwind classes only
+<div className="bg-red-500">
+```
+
+### Conditional Classes - Use cn()
+
+```tsx
+// ❌ Ternary in className
+<button className={isActive ? "bg-blue-500 text-white" : "bg-gray-200"}>
+
+// ❌ Template literals
+<button className={`px-4 py-2 ${isActive ? "bg-blue-500" : ""}`}>
+
+// ✅ cn() utility
+import { cn } from "@/lib/utils";
+
+<button className={cn(
+  "px-4 py-2 rounded-md",
+  isActive && "bg-blue-500 text-white",
+  disabled && "opacity-50 cursor-not-allowed"
+)}>
+```
+
+### Linting - Biome
+
+This project uses **Biome** (not ESLint):
+
+```bash
+# Check linting
+pnpm lint
+
+# Fix linting issues
+pnpm lint:fix
+
+# Format code
+pnpm format
+```
+
+### Unused Code - knip
+
+Detect unused exports, dependencies, and files:
+
+```bash
+pnpm knip
+```
+
+**Flags:**
+- Unused exports (except in `src/components/ui/`)
+- Unused dependencies
+- Unused type exports

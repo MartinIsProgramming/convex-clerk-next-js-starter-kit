@@ -38,6 +38,22 @@ CODE SMELLS:
 ├── Magic numbers/strings? → Extract to constants
 ├── Comments explaining "what"? → Code should be self-documenting
 └── Dead code? → Remove it
+
+CONVEX FUNCTIONS (convex/*.ts):
+├── Missing args/returns validators? → Add validators
+├── Using filter() in query? → Change to withIndex()
+├── Index naming correct? → Use by_field1_and_field2
+├── Auth check in mutation? → Verify security
+├── try/catch silencing errors? → Let errors propagate
+└── Public function should be private? → Use internal*
+
+NEXT.JS COMPONENTS (src/**/*.tsx):
+├── "use client" without hooks/events? → Remove directive
+├── useQuery when preloadQuery works? → Move fetch to server
+├── Suspense wrapping entire page? → Use granular suspense
+├── Missing component name suffix? → Add *Content/*Form/*Dialog
+├── Not using cn() for classes? → Use cn() utility
+└── Relative imports? → Use @/ path alias
 ```
 
 ## Output Format
@@ -63,6 +79,7 @@ Want me to refactor any of these?
 
 ## References
 
-- **Clean code rules** → references/clean-code.md (general principles)
-- **Next.js patterns** → references/nextjs-patterns.md (framework-specific)
+- **Clean code rules** → references/clean-code.md (general principles + project-specific)
+- **Next.js patterns** → references/nextjs-patterns.md (components, data fetching, forms)
+- **Convex patterns** → references/convex-patterns.md (functions, validators, auth)
 - **Refactoring recipes** → references/refactoring-recipes.md (how to fix common issues)
