@@ -1,51 +1,133 @@
-# Welcome to your Convex + Next.js + Clerk app
+# Next.js Convex Starter
 
-This is a [Convex](https://convex.dev/) project created with [`npm create convex`](https://www.npmjs.com/package/create-convex).
+A full-stack starter kit with Next.js 15, Convex, Clerk authentication, and shadcn/ui.
 
-After the initial setup (<2 minutes) you'll have a working full-stack app using:
+## Tech Stack
 
-- Convex as your backend (database, server logic)
-- [React](https://react.dev/) as your frontend (web page interactivity)
-- [Next.js](https://nextjs.org/) for optimized web hosting and page routing
-- [Tailwind](https://tailwindcss.com/) for building great looking accessible UI
-- [Clerk](https://clerk.com/) for authentication
+| Category | Technology |
+|----------|------------|
+| Frontend | Next.js 15, React 19, Tailwind CSS 4 |
+| Backend | Convex |
+| Auth | Clerk |
+| UI | shadcn/ui, Radix UI, Lucide Icons |
+| Tooling | TypeScript 5.9, Biome, pnpm |
 
-## Get started
+## Features
 
-If you just cloned this codebase and didn't use `npm create convex`, run:
+- Clerk authentication (sign-in/sign-up)
+- User sync via Clerk → Convex webhooks
+- Protected dashboard with responsive sidebar
+- Pre-configured shadcn/ui components
+- Strict TypeScript
+- Biome linting & formatting
+
+## Prerequisites
+
+- Node.js 18+
+- pnpm
+- [Convex account](https://convex.dev/)
+- [Clerk account](https://clerk.com/)
+
+## Getting Started
+
+### 1. Clone and install dependencies
+
+```bash
+git clone <repository-url>
+cd starter-kit
+pnpm install
+```
+
+### 2. Set up environment variables
+
+Copy the example file and fill in your values:
+
+```bash
+cp .env.local.example .env.local
+```
+
+### 3. Configure Convex
+
+```bash
+npx convex dev
+```
+
+This will prompt you to log in and create a new project.
+
+### 4. Configure Clerk
+
+1. Create a new application in [Clerk Dashboard](https://dashboard.clerk.com/)
+2. Copy your API keys to `.env.local`
+3. Create a JWT template named "convex" and copy the Issuer URL
+
+### 5. Set up Clerk webhook (for user sync)
+
+1. Go to Clerk Dashboard → Webhooks
+2. Create a new webhook with endpoint: `<YOUR_CONVEX_URL>/clerk-users-webhook`
+3. Subscribe to events: `user.created`, `user.updated`, `user.deleted`
+4. Copy the Signing Secret to Convex Dashboard → Settings → Environment Variables as `CLERK_WEBHOOK_SECRET`
+
+### 6. Run development server
+
+```bash
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) to see your app.
+
+## Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `NEXT_PUBLIC_CONVEX_URL` | Your Convex deployment URL |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Clerk public key |
+| `CLERK_SECRET_KEY` | Clerk secret key |
+| `CLERK_WEBHOOK_SECRET` | Webhook signing secret (set in Convex Dashboard) |
+| `CLERK_JWT_ISSUER_DOMAIN` | JWT template Issuer URL |
+| `CONVEX_DEPLOYMENT` | Convex deployment ID |
+| `NEXT_PUBLIC_CLERK_SIGN_IN_URL` | Sign-in page URL (`/sign-in`) |
+| `NEXT_PUBLIC_CLERK_SIGN_UP_URL` | Sign-up page URL (`/sign-up`) |
+| `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL` | Redirect after sign-in (`/dashboard`) |
+| `NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL` | Redirect after sign-up (`/dashboard`) |
+
+## Available Scripts
+
+| Script | Description |
+|--------|-------------|
+| `pnpm dev` | Start development server (frontend + backend) |
+| `pnpm build` | Build for production |
+| `pnpm start` | Start production server |
+| `pnpm lint` | Check code with Biome |
+| `pnpm lint:fix` | Auto-fix linting issues |
+| `pnpm format` | Format code with Biome |
+
+## Project Structure
 
 ```
-npm install
-npm run dev
+├── src/
+│   ├── app/                    # Next.js app router
+│   │   ├── (auth)/             # Auth routes (sign-in, sign-up)
+│   │   └── (dashboard)/        # Protected dashboard routes
+│   ├── components/
+│   │   ├── ui/                 # shadcn/ui components
+│   │   └── layout/             # Layout components
+│   ├── features/
+│   │   └── dashboard/          # Dashboard feature module
+│   │       ├── components/     # Sidebar, nav components
+│   │       ├── config/         # Sidebar configuration
+│   │       └── types/          # TypeScript types
+│   ├── hooks/                  # Custom React hooks
+│   ├── lib/                    # Utilities (auth, cn)
+│   ├── provider/               # Context providers
+│   └── middleware.ts           # Clerk auth middleware
+├── convex/
+│   ├── schema.ts               # Database schema
+│   ├── users.ts                # User queries & mutations
+│   ├── auth.config.ts          # Clerk JWT config
+│   └── http.ts                 # Webhook endpoint
+└── public/                     # Static assets
 ```
 
-If you're reading this README on GitHub and want to use this template, run:
+## License
 
-```
-npm create convex@latest -- -t nextjs-clerk
-```
-
-Then:
-
-1. Open your app. There should be a "Claim your application" button from Clerk in the bottom right of your app.
-2. Follow the steps to claim your application and link it to this app.
-3. Follow step 3 in the [Convex Clerk onboarding guide](https://docs.convex.dev/auth/clerk#get-started) to create a Convex JWT template.
-4. Uncomment the Clerk provider in `convex/auth.config.ts`
-5. Paste the Issuer URL as `CLERK_JWT_ISSUER_DOMAIN` to your dev deployment environment variable settings on the Convex dashboard (see [docs](https://docs.convex.dev/auth/clerk#configuring-dev-and-prod-instances))
-
-If you want to sync Clerk user data via webhooks, check out this [example repo](https://github.com/thomasballinger/convex-clerk-users-table/).
-
-## Learn more
-
-To learn more about developing your project with Convex, check out:
-
-- The [Tour of Convex](https://docs.convex.dev/get-started) for a thorough introduction to Convex principles.
-- The rest of [Convex docs](https://docs.convex.dev/) to learn about all Convex features.
-- [Stack](https://stack.convex.dev/) for in-depth articles on advanced topics.
-
-## Join the community
-
-Join thousands of developers building full-stack apps with Convex:
-
-- Join the [Convex Discord community](https://convex.dev/community) to get help in real-time.
-- Follow [Convex on GitHub](https://github.com/get-convex/), star and contribute to the open-source implementation of Convex.
+MIT
