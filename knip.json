@@ -1,0 +1,10 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": ["src/app/**/*.{ts,tsx}", "src/middleware.ts", "convex/*.ts"],
+  "project": ["src/**/*.{ts,tsx}", "convex/*.ts"],
+  "ignore": ["convex/_generated/**"],
+  "ignoreDependencies": ["tailwindcss", "tw-animate-css", "postcss"],
+  "ignoreIssues": {
+    "src/components/ui/**": ["exports"]
+  }
+}
