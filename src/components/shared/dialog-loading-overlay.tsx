@@ -20,7 +20,7 @@ type DialogLoadingOverlayProps = {
  * @example
  * <Dialog open onOpenChange={onClose}>
  *   {isPending ? (
- *     <DialogLoadingOverlay text="Loading..." />
+ *     <DialogLoadingOverlay text="Cargando documento..." />
  *   ) : (
  *     <DialogContent>...</DialogContent>
  *   )}

@@ -1,55 +1,39 @@
 "use client";
 
 import { useAction } from "convex/react";
-import type { FunctionArgs, FunctionReference, FunctionReturnType } from "convex/server";
-import { useState } from "react";
+import type { FunctionReference, FunctionReturnType } from "convex/server";
 import { toast } from "sonner";
 
-type ActionWithToastOptions = {
+type ActionOptions = {
   successMessage?: string;
   errorMessage?: string;
-  onSuccess?: () => void;
-  onError?: (error: Error) => void;
 };
 
-/**
- * A wrapper around useAction that automatically shows toast notifications.
- *
- * @example
- * ```tsx
- * const generateReport = useActionWithToast(api.reports.generate, {
- *   successMessage: "Report generated",
- *   errorMessage: "Error generating report",
- * });
- *
- * <button onClick={() => generateReport({ type: "monthly" })}>Generate</button>
- * ```
- */
-export function useActionWithToast<Action extends FunctionReference<"action">>(
-  action: Action,
-  options: ActionWithToastOptions = {},
-) {
-  const actionFn = useAction(action);
-  const [isPending, setIsPending] = useState(false);
+type ActionResult<T> = { success: true; data: T } | { success: false; error: Error };
 
-  const execute = async (args: FunctionArgs<Action>): Promise<FunctionReturnType<Action>> => {
-    setIsPending(true);
+export function useActionWithToast<T extends FunctionReference<"action">>(
+  action: T,
+  options: ActionOptions = {},
+) {
+  const runAction = useAction(action);
+
+  const execute = async (
+    args: T extends FunctionReference<"action", "public", infer Args> ? Args : never,
+  ): Promise<ActionResult<FunctionReturnType<T>>> => {
     try {
-      const result = await actionFn(args);
+      const result = await runAction(args);
       if (options.successMessage) {
         toast.success(options.successMessage);
       }
-      options.onSuccess?.();
-      return result;
+      return { success: true, data: result };
     } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : "Unknown error";
-      toast.error(options.errorMessage ?? errorMsg);
-      options.onError?.(error instanceof Error ? error : new Error(errorMsg));
-      throw error;
-    } finally {
-      setIsPending(false);
+      const err = error instanceof Error ? error : new Error("Ocurrió un error inesperado");
+      toast.error(options.errorMessage ?? "Error", {
+        description: err.message,
+      });
+      return { success: false, error: err };
     }
   };
 
-  return Object.assign(execute, { isPending });
+  return execute;
 }

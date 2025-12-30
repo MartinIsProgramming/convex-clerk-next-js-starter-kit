@@ -59,7 +59,7 @@ export function DataTableToolbar<TData>({
     <div className="flex items-center gap-2 py-4">
       {!hideSearch && (
         <Input
-          placeholder={filterPlaceholder ?? "Search..."}
+          placeholder={filterPlaceholder ?? "Buscar..."}
           value={isControlled ? searchValue : internalValue}
           onChange={handleChange}
           className="w-[200px]"
@@ -70,7 +70,7 @@ export function DataTableToolbar<TData>({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">
-              Columns <ChevronDown className="ml-2 h-4 w-4" />
+              Columnas <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">

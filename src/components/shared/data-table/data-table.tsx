@@ -133,7 +133,7 @@ export function DataTable<TData>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-48 text-center">
-                  {emptyState ?? "No results."}
+                  {emptyState ?? "Sin resultados."}
                 </TableCell>
               </TableRow>
             )}

@@ -1,55 +1,39 @@
 "use client";
 
 import { useMutation } from "convex/react";
-import type { FunctionArgs, FunctionReference, FunctionReturnType } from "convex/server";
-import { useState } from "react";
+import type { FunctionReference, FunctionReturnType } from "convex/server";
 import { toast } from "sonner";
 
-type MutationWithToastOptions = {
+type MutationOptions = {
   successMessage?: string;
   errorMessage?: string;
-  onSuccess?: () => void;
-  onError?: (error: Error) => void;
 };
 
-/**
- * A wrapper around useMutation that automatically shows toast notifications.
- *
- * @example
- * ```tsx
- * const deleteProduct = useMutationWithToast(api.products.remove, {
- *   successMessage: "Product deleted",
- *   errorMessage: "Error deleting product",
- * });
- *
- * <button onClick={() => deleteProduct({ id: productId })}>Delete</button>
- * ```
- */
-export function useMutationWithToast<Mutation extends FunctionReference<"mutation">>(
-  mutation: Mutation,
-  options: MutationWithToastOptions = {},
-) {
-  const mutationFn = useMutation(mutation);
-  const [isPending, setIsPending] = useState(false);
+type MutationResult<T> = { success: true; data: T } | { success: false; error: Error };
 
-  const execute = async (args: FunctionArgs<Mutation>): Promise<FunctionReturnType<Mutation>> => {
-    setIsPending(true);
+export function useMutationWithToast<T extends FunctionReference<"mutation">>(
+  mutation: T,
+  options: MutationOptions = {},
+) {
+  const mutate = useMutation(mutation);
+
+  const execute = async (
+    args: T extends FunctionReference<"mutation", "public", infer Args> ? Args : never,
+  ): Promise<MutationResult<FunctionReturnType<T>>> => {
     try {
-      const result = await mutationFn(args);
+      const result = await mutate(args);
       if (options.successMessage) {
         toast.success(options.successMessage);
       }
-      options.onSuccess?.();
-      return result;
+      return { success: true, data: result };
     } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : "Unknown error";
-      toast.error(options.errorMessage ?? errorMsg);
-      options.onError?.(error instanceof Error ? error : new Error(errorMsg));
-      throw error;
-    } finally {
-      setIsPending(false);
+      const err = error instanceof Error ? error : new Error("Ocurrió un error inesperado");
+      toast.error(options.errorMessage ?? "Error", {
+        description: err.message,
+      });
+      return { success: false, error: err };
     }
   };
 
-  return Object.assign(execute, { isPending });
+  return execute;
 }
