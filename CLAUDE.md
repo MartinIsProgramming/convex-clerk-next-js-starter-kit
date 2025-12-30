@@ -23,6 +23,12 @@ pnpm knip         # Detectar código no usado
 - **Forms**: React Hook Form + Zod
 - **Linting**: Biome (no ESLint)
 
+## Testing with Clerk
+
+Email: `test+clerk_test@example.com`
+Code: `424242`
+
+
 ## Estructura
 
 ```
