@@ -1,10 +1,20 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
-  "entry": ["src/app/**/*.{ts,tsx}", "src/middleware.ts", "convex/*.ts"],
-  "project": ["src/**/*.{ts,tsx}", "convex/*.ts"],
-  "ignore": ["convex/_generated/**"],
-  "ignoreDependencies": ["tailwindcss", "tw-animate-css", "postcss"],
-  "ignoreIssues": {
-    "src/components/ui/**": ["exports"]
+  "ignore": [
+    "**/*.test.{ts,tsx}",
+    "**/*.spec.{ts,tsx}",
+    "**/__tests__/**",
+    "src/lib/utils.ts",
+    "src/components/ui/**"
+  ],
+  "ignoreDependencies": ["tailwindcss", "tw-animate-css"],
+  "entry": ["src/app/**/*.{ts,tsx}", "src/features/**/index.ts", "convex/**/*.ts"],
+  "project": ["src/**/*.{ts,tsx}", "convex/**/*.ts"],
+  "rules": {
+    "exports": "warn",
+    "types": "warn"
+  },
+  "paths": {
+    "src/components/ui/*": ["src/components/ui/*"]
   }
 }
