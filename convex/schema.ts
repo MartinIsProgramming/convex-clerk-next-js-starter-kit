@@ -8,5 +8,5 @@ export default defineSchema({
     firstName: v.optional(v.string()),
     lastName: v.optional(v.string()),
     imageUrl: v.optional(v.string()),
-  }).index("by_clerk_id", ["clerkId"]),
+  }).index("by_clerkId", ["clerkId"]), // Renombrado para convención by_fieldName
 });
